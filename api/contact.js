@@ -8,8 +8,8 @@ const ALLOWED_ORIGINS = [
 ];
 
 export default async function handler(req, res) {
+  // CORS
   const origin = req.headers.origin;
-
   if (ALLOWED_ORIGINS.includes(origin)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
   }
@@ -17,10 +17,12 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
+  // Preflight
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
 
+  // Solo POST
   if (req.method !== "POST") {
     return res.status(405).json({ ok: false, message: "Method not allowed" });
   }
@@ -52,7 +54,7 @@ export default async function handler(req, res) {
       <p style="white-space: pre-line;">${mensaje}</p>
     `;
 
-    const result = await resend.emails.send({
+    await resend.emails.send({
       from: "Innube Contacto <onboarding@resend.dev>",
       to: ["fgomezes979@gmail.com"],
       replyTo: correo,
@@ -60,7 +62,7 @@ export default async function handler(req, res) {
       html,
     });
 
-    return res.status(200).json({ ok: true, result });
+    return res.status(200).json({ ok: true });
   } catch (error) {
     console.error("API error:", error);
     return res.status(500).json({ ok: false, message: "Error enviando correo" });
